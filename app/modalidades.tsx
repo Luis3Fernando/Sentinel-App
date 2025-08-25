@@ -1,14 +1,138 @@
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useModalidades } from "../src/hooks/useModalidades";
 
 export default function ModalidadesScreen() {
+  const [ubigeo, setUbigeo] = useState("030101");
+  const [query, setQuery] = useState("030101");
+
+  const { data, loading, error, fetchModalidades } = useModalidades();
+
+  const handleBuscar = () => {
+    if (ubigeo.trim()) {
+      setQuery(ubigeo.trim());
+      fetchModalidades(ubigeo.trim());
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0066cc" />
+        <Text style={{ marginTop: 10 }}>Cargando información...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={{ color: "red" }}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>🎯 Modalidades</Text>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.input}
+          value={ubigeo}
+          onChangeText={setUbigeo}
+          placeholder="030101"
+          keyboardType="numeric"
+        />
+        <TouchableOpacity style={styles.button} onPress={handleBuscar}>
+          <Text style={styles.buttonText}>Buscar</Text>
+        </TouchableOpacity>
+      </View>
+
+      {data && data.length > 0 ? (
+        <FlatList
+          data={data}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Text style={styles.title}>{item.p_modalidades}</Text>
+              <Text style={styles.info}>Total: {item.total}</Text>
+            </View>
+          )}
+        />
+      ) : (
+        <Text style={{ marginTop: 20 }}>No se encontraron datos</Text>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  text: { fontSize: 20, fontWeight: "bold" },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f4f6f8",
+    paddingTop: 50,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  button: {
+    backgroundColor: "#0066cc",
+    marginLeft: 10,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  list: {
+    paddingBottom: 20,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 6,
+    color: "#333",
+  },
+  info: {
+    fontSize: 15,
+    color: "#555",
+  },
 });
