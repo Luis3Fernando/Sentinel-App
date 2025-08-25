@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { COLORS } from "../src/config/colors";
 import { useTemporal } from "../src/hooks/useTemporal";
+
+const MONTHS = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"
+];
 
 export default function TemporadaScreen() {
   const { data, loading, error, fetchTemporal } = useTemporal();
@@ -12,7 +18,7 @@ export default function TemporadaScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>Cargando temporada...</Text>
+        <Text style={styles.subtitle}>Cargando temporada...</Text>
       </View>
     );
   }
@@ -20,7 +26,7 @@ export default function TemporadaScreen() {
   if (error) {
     return (
       <View style={styles.container}>
-        <Text style={[styles.text, { color: "red" }]}>Error: {error}</Text>
+        <Text style={[styles.subtitle, { color: "red" }]}>Error: {error}</Text>
       </View>
     );
   }
@@ -28,25 +34,33 @@ export default function TemporadaScreen() {
   if (data.length === 0) {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>No hay registros de temporada</Text>
+        <Text style={styles.subtitle}>No hay registros de temporada</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+     <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Temporada</Text>
+        <Text style={styles.subtitle}>Total de robos por temporada</Text>
+      </View>
+
       <FlatList
         data={data}
         keyExtractor={(item, index) => index.toString()}
         numColumns={2}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{item.mes}</Text>
-            <Text style={styles.cardSubtitle}>
-              {item.total} robos
-            </Text>
-          </View>
-        )}
+        columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 16 }}
+        renderItem={({ item }) => {
+          const mesIndex = item.mes - 1;
+          const mesNombre = MONTHS[mesIndex] || item.mes;
+          return (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>{mesNombre}</Text>
+              <Text style={styles.cardSubtitle}>{item.total} robos</Text>
+            </View>
+          );
+        }}
         contentContainerStyle={styles.list}
       />
     </View>
@@ -56,37 +70,48 @@ export default function TemporadaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#f9fafb",
+    backgroundColor: COLORS.background,
+    padding: 20,
+    paddingTop: 50,
   },
-  text: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#374151",
+  headerContainer: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: COLORS.white,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.white,
+    marginTop: 4,
+    textAlign: "center",
   },
   list: {
     paddingBottom: 20,
   },
   card: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.gray,
     margin: 8,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 5,
     elevation: 3,
     alignItems: "center",
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#1f2937",
+    color: COLORS.white,
     marginBottom: 6,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: "#4b5563",
+    color: "#DDDDDD",
   },
 });

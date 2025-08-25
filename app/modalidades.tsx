@@ -10,6 +10,9 @@ import {
 } from "react-native";
 import { useModalidades } from "../src/hooks/useModalidades";
 
+import { COLORS } from "../src/config/colors";
+
+
 export default function ModalidadesScreen() {
   const [ubigeo, setUbigeo] = useState("030101");
   const [query, setQuery] = useState("030101");
@@ -25,7 +28,7 @@ export default function ModalidadesScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <View style={styles.container}>
         <ActivityIndicator size="large" color="#0066cc" />
         <Text style={{ marginTop: 10 }}>Cargando información...</Text>
       </View>
@@ -34,7 +37,7 @@ export default function ModalidadesScreen() {
 
   if (error) {
     return (
-      <View style={styles.centered}>
+      <View style={styles.container}>
         <Text style={{ color: "red" }}>{error}</Text>
       </View>
     );
@@ -42,12 +45,18 @@ export default function ModalidadesScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Modalidades</Text>
+        <Text style={styles.subtitle}>Total de robos agrupados por modalidad</Text>
+      </View>
+
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.input}
           value={ubigeo}
           onChangeText={setUbigeo}
           placeholder="030101"
+          placeholderTextColor={COLORS.gray}
           keyboardType="numeric"
         />
         <TouchableOpacity style={styles.button} onPress={handleBuscar}>
@@ -63,12 +72,12 @@ export default function ModalidadesScreen() {
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.title}>{item.p_modalidades}</Text>
-              <Text style={styles.info}>Total: {item.total}</Text>
+              <Text style={styles.info}>Total de robos: {item.total}</Text>
             </View>
           )}
         />
       ) : (
-        <Text style={{ marginTop: 20 }}>No se encontraron datos</Text>
+        <Text style={styles.noDataText}>No se encontraron datos</Text>
       )}
     </View>
   );
@@ -77,62 +86,80 @@ export default function ModalidadesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
     padding: 20,
-    backgroundColor: "#f4f6f8",
     paddingTop: 50,
   },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
+  headerContainer: {
+    marginBottom: 20,
     alignItems: "center",
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: COLORS.white,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.white,
+    marginTop: 4,
+    textAlign: "center",
   },
   searchContainer: {
     flexDirection: "row",
     marginBottom: 20,
+    alignItems: "center",
   },
   input: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     borderRadius: 10,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderWidth: 1,
     borderColor: "#ddd",
+    fontSize: 16,
   },
   button: {
-    backgroundColor: "#0066cc",
+    backgroundColor: COLORS.primary,
     marginLeft: 10,
     borderRadius: 10,
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     justifyContent: "center",
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: COLORS.white,
     fontWeight: "bold",
   },
   list: {
     paddingBottom: 20,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: COLORS.gray,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 5,
     elevation: 3,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
+    color: COLORS.white,
     marginBottom: 6,
-    color: "#333",
   },
   info: {
-    fontSize: 15,
-    color: "#555",
+    fontSize: 14,
+    color: "#DDDDDD",
+  },
+  noDataText: {
+    marginTop: 20,
+    textAlign: "center",
+    color: COLORS.gray,
+    fontSize: 16,
   },
 });

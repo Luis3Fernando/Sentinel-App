@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   FlatList,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import { COLORS } from "../src/config/colors";
 import { useHistorial } from "../src/hooks/useHistorial";
+
+const { width } = Dimensions.get("window");
+const CARD_WIDTH = (width - 60) / 2; 
 
 export default function HistorialScreen() {
   const [ubigeo, setUbigeo] = useState("030101");
@@ -30,7 +35,7 @@ export default function HistorialScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <View style={styles.container}>
         <ActivityIndicator size="large" color="#0066cc" />
         <Text style={{ marginTop: 10 }}>Cargando información...</Text>
       </View>
@@ -39,7 +44,7 @@ export default function HistorialScreen() {
 
   if (error) {
     return (
-      <View style={styles.centered}>
+      <View style={styles.container}>
         <Text style={{ color: "red" }}>{error}</Text>
       </View>
     );
@@ -47,14 +52,17 @@ export default function HistorialScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Historial por Ubigeo y Mes</Text>
-
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Historial</Text>
+        <Text style={styles.subtitle}>Ver historial de robos por ubigeo y mes</Text>
+      </View>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.input}
           value={ubigeo}
           onChangeText={setUbigeo}
           placeholder="030101"
+          placeholderTextColor={COLORS.gray}
           keyboardType="numeric"
         />
         <TextInput
@@ -62,30 +70,32 @@ export default function HistorialScreen() {
           value={mes}
           onChangeText={setMes}
           placeholder="Mes"
+          placeholderTextColor={COLORS.gray}
           keyboardType="numeric"
         />
         <TouchableOpacity style={styles.button} onPress={handleBuscar}>
           <Text style={styles.buttonText}>Buscar</Text>
         </TouchableOpacity>
       </View>
-
       {data && data.length > 0 ? (
         <FlatList
           data={data}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.list}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 16 }}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Text style={styles.title}>Año: {item.anio}</Text>
-              <Text style={styles.info}>Mes: {item.mes}</Text>
+              <View style={styles.yearBadge}>
+                <Text style={styles.yearText}>{item.anio}</Text>
+              </View>
+              <Text style={styles.title}>Mes: {item.mes}</Text>
               <Text style={styles.info}>Total de robos: {item.total}</Text>
             </View>
           )}
         />
       ) : (
-        <Text style={{ marginTop: 20, textAlign: "center" }}>
-          No se encontraron datos
-        </Text>
+        <Text style={styles.noDataText}>No se encontraron datos</Text>
       )}
     </View>
   );
@@ -94,21 +104,24 @@ export default function HistorialScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
     padding: 20,
-    backgroundColor: "#f4f6f8",
     paddingTop: 50,
   },
-  header: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#333",
-    textAlign: "center",
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
+  headerContainer: {
+    marginBottom: 20,
     alignItems: "center",
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: COLORS.white,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.white,
+    marginTop: 4,
+    textAlign: "center",
   },
   searchContainer: {
     flexDirection: "row",
@@ -117,47 +130,70 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     borderRadius: 10,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderWidth: 1,
     borderColor: "#ddd",
+    fontSize: 16,
   },
   button: {
-    backgroundColor: "#0066cc",
+    backgroundColor: COLORS.primary,
     marginLeft: 10,
     borderRadius: 10,
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     justifyContent: "center",
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: COLORS.white,
     fontWeight: "bold",
   },
   list: {
     paddingBottom: 20,
+    paddingTop: 20
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: COLORS.gray,
+    borderRadius: 16,
     padding: 16,
-    marginBottom: 12,
+    width: CARD_WIDTH,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 5,
     elevation: 3,
+    position: "relative",
+  },
+  yearBadge: {
+    position: "absolute",
+    top: -10,
+    right: -1,
+    backgroundColor: COLORS.primary,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  yearText: {
+    color: COLORS.white,
+    fontWeight: "bold",
+    fontSize: 14,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 6,
-    color: "#333",
+    color: COLORS.white,
+    marginBottom: 4,
   },
   info: {
-    fontSize: 15,
-    color: "#555",
+    fontSize: 14,
+    color: "#DDDDDD",
+  },
+  noDataText: {
+    marginTop: 20,
+    textAlign: "center",
+    color: COLORS.gray,
+    fontSize: 16,
   },
 });
